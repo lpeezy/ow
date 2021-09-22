@@ -7,5 +7,12 @@ module.exports = {
   },
   transpileDependencies: [
     'quasar'
-  ]
+  ],
+  css: {
+    loaderOptions: {
+      sass: {
+        data: `@import "@/styles/app.scss"`
+      }
+    }
+  }
 }
