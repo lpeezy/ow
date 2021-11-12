@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
+
+html, body {
+  font-family: 'Roboto', sans-serif;
+}
+#card {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Responsive columns */
+@media screen and (max-width: 960px) {
+  #cards {
+    width: 100%;
+    display: block;
+    margin-bottom: 20px;
+  }
+}
+
+.player-stats {
+  .q-table__top,
+  .q-table__bottom,
+  table {
+    background-color: #45484c;
+    color: white;
+  }
+  
+}
+
+.exp-panel {
+  color:rgb(185, 185, 185);
+  background-color: #2E3135;
+  width: 100%;
+  font-size: 20px;
+}
+.exp-card {
+  background-color: #2E3135;
+  width: 100%;
+}

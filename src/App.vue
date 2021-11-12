@@ -24,8 +24,8 @@
               style="background: #36393e; color: white; width: 100%; height: 100%; font-size: 20px"
               size="md"
               label="Player Profiles"
+              @click="showProfile()"
               no-caps
-              @click="queryProfile"
             />
           </div>
           <div class="col">
@@ -34,6 +34,7 @@
               style="background: #36393e; color: white; width: 100%; height: 100%; font-size: 20px"
               size="md"
               label="Players Stats"
+              @click="showStats()"
               no-caps
             />
           </div>
@@ -43,7 +44,7 @@
     </q-drawer>
 
     <q-page-container>
-      <div class="q-pa-md wrap">
+      <div class="q-pa-md wrap" v-if="showProfiles">
         <div class="row">
           <div
             class="col-2"
@@ -61,35 +62,129 @@
                   </div>
                   <div class="text-subtitle2">
                     <b>Quickplay Hrs:</b>
-                    {{ obj.qptime || "No data (private profile)" }}
+                    {{ obj.qptime || "No data (profile set to private)" }}
                   </div>
                   <div class="text-subtitle2">
                     <b>Competative Hrs:</b>
-                    {{ obj.comptime || "No data (private profile)" }}
+                    {{ obj.comptime || "No data (profile set to private)" }}
                   </div>
                 </div>
               </q-img>
 
               <q-card-section>
                 <q-tabs v-model="tab" class="text-teal">
-                  <q-tab name="mails" label="Quickplay" style="color: #86009e" />
+                  <q-tab
+                    name="mails"
+                    label="Quickplay"
+                    style="color: #86009e"
+                  />
                   <q-tab name="comp" label="Competive" style="color: #86009e" />
                 </q-tabs>
                 <q-separator />
                 <q-tab-panels v-model="tab" animated>
-          <q-tab-panel name="mails">
-            <div class="text-h6">Mails</div>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </q-tab-panel>
+                  <q-tab-panel name="mails">
+                    <div class="text-h6">Mails</div>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  </q-tab-panel>
 
-          <q-tab-panel name="comp">
-            <div class="text-h6">Alarms</div>
-            <p v-for="(value, name) in obj.stats.average.competitive" v-bind:key="name"><b>{{ value.title }}</b> : {{ value.value }}</p>
-          </q-tab-panel>
-          </q-tab-panels>
+                  <q-tab-panel name="comp">
+                    <div class="text-h6">Alarms</div>
+                    <p
+                      v-for="(value, name) in obj.stats.average.competitive"
+                      v-bind:key="name"
+                    >
+                      <b>{{ value.title }}</b> : {{ value.value }}
+                    </p>
+                  </q-tab-panel>
+                </q-tab-panels>
               </q-card-section>
             </q-card>
           </div>
+        </div>
+      </div>
+      <div v-if="!showProfiles">
+        <div class="q-pa-md">
+          <q-list bordered class="rounded-borders">
+            <q-expansion-item
+              expand-separator
+              icon="perm_identity"
+              label="Assists"
+              class="exp-panel"
+              default-opened
+            >
+              <q-card style="background-color: #2E3135">
+                <q-card-section>
+                  <div class="q-pa-md exp-card">
+                    <q-table
+                      class="player-stats"
+                      color="secondary"
+                      title="Competitive"
+                      :rows="cAssistsRows"
+                      :rows-per-page-options="[10, 20]"
+                      :columns="columns"
+                      row-key="name"
+                    />
+                  </div>
+                  <hr>
+                  <div class="q-pa-md exp-card">
+                    <q-table
+                      class="player-stats"
+                      color="secondary"
+                      title="Quickplay"
+                      :rows="qAssistsRows"
+                      :rows-per-page-options="[10, 20]"
+                      :columns="columns"
+                      row-key="name"
+                    />
+                  </div>
+                </q-card-section>
+              </q-card>
+            </q-expansion-item>
+
+            <q-expansion-item
+              expand-separator
+              icon="signal_wifi_off"
+              label="Wifi settings"
+              class="exp-panel"
+            >
+              <q-card>
+                <q-card-section>
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                  Quidem, eius reprehenderit eos corrupti commodi magni quaerat
+                  ex numquam, dolorum officiis modi facere maiores architecto
+                  suscipit iste eveniet doloribus ullam aliquid.
+                </q-card-section>
+              </q-card>
+            </q-expansion-item>
+
+            <q-expansion-item
+              expand-separator
+              icon="drafts"
+              label="Drafts"
+              header-class="text-purple"
+              class="exp-panel"
+            >
+              <q-card>
+                <q-card-section>
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                  Quidem, eius reprehenderit eos corrupti commodi magni quaerat
+                  ex numquam, dolorum officiis modi facere maiores architecto
+                  suscipit iste eveniet doloribus ullam aliquid.
+                </q-card-section>
+              </q-card>
+            </q-expansion-item>
+
+            <q-expansion-item icon="assessment" label="Disabled" disable>
+              <q-card>
+                <q-card-section>
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                  Quidem, eius reprehenderit eos corrupti commodi magni quaerat
+                  ex numquam, dolorum officiis modi facere maiores architecto
+                  suscipit iste eveniet doloribus ullam aliquid.
+                </q-card-section>
+              </q-card>
+            </q-expansion-item>
+          </q-list>
         </div>
       </div>
     </q-page-container>
@@ -98,6 +193,32 @@
 
 <script>
 import { ref } from "vue";
+
+const columns = [
+  {
+    name: "player",
+    required: true,
+    label: "Player",
+    align: "left",
+    field: (row) => row.name,
+    format: (val) => `${val}`,
+  },
+  {
+    name: "Defensive Assists",
+    align: "center",
+    label: "Defensive Assists",
+    field: "dassist",
+    sortable: true,
+  },
+  {
+    name: "Healing Done",
+    label: "Healing Done",
+    field: "hdone",
+    sortable: true,
+  },
+  { name: "Offensive Assists", label: "Offensive Assists", field: "oassist", sortable: true, },
+  { name: "Recon Assists", label: "Recon Assists", field: "rassist", sortable: true, },
+];
 
 export default {
   setup() {
@@ -113,9 +234,14 @@ export default {
   },
   data() {
     return {
+      showProfiles: true,
       apiStatus: false,
-      profileData: [],
       data: [],
+      cassists: [],
+      qassists: [],
+      columns,
+      cAssistsRows: [],
+      qAssistsRows: [],
       userNames: [
         "BoX-1206",
         "Lpeezydos-1106",
@@ -138,15 +264,15 @@ export default {
       fetch("https://owapi.io/")
         .then((response) => response.json())
         .then((this.apiStatus = true))
-        .then(this.queryProfile());
+        .then(this.queryStats());
+    },
+    showProfile() {
+      this.showProfiles = true;
+    },
+    showStats() {
+      this.showProfiles = false;
     },
     queryStats() {
-      // checking that the API is reachable before querying
-      /* if (this.apiStatus === true){
-
-      } */
-    },
-    queryProfile() {
       // checking that the API is reachable before querying
       if (this.apiStatus === true) {
         for (const user in this.userNames) {
@@ -163,11 +289,70 @@ export default {
                   data2.qptime = quickplaytime;
                   data2.comptime = compplaytime;
                   this.data.push(data2);
+                  if (this.data.length === 7) {
+                    this.buildTableData();
+                  }
                 });
             });
         }
         console.log(this.data);
       }
+    },
+    buildTableData() {
+      for (const obj in this.data) {
+        let cAssistObj = {};
+        let qpAssistObj = {};
+
+        cAssistObj.name = this.data[obj].username;
+        qpAssistObj.name = this.data[obj].username;
+
+        let compStats = this.data[obj].stats.assists.competitive;
+        let qpStats = this.data[obj].stats.assists.quickplay;
+        for (const cobj in compStats) {
+          if (compStats[cobj].title === "Defensive Assists") {
+            let pointNum = parseFloat(compStats[cobj].value);
+            cAssistObj.dassist = pointNum;
+          }
+          if (compStats[cobj].title === "Offensive Assists") {
+            let pointNum = parseFloat(compStats[cobj].value);
+            cAssistObj.oassist = pointNum;
+          }
+          if (compStats[cobj].title === "Healing Done") {
+            let pointNum = parseFloat(compStats[cobj].value);
+            cAssistObj.hdone = pointNum;
+          }
+          if (compStats[cobj].title === "Recon Assists") {
+            let pointNum = parseFloat(compStats[cobj].value);
+            cAssistObj.rassist = pointNum;
+          }
+        }
+        this.cassists.push(cAssistObj);
+        for (const qobj in qpStats) {
+          if (qpStats[qobj].title === "Defensive Assists") {
+            let pointNum = parseFloat(qpStats[qobj].value);
+            qpAssistObj.dassist = pointNum;
+          }
+          if (qpStats[qobj].title === "Offensive Assists") {
+            let pointNum = parseFloat(qpStats[qobj].value);
+            qpAssistObj.oassist = pointNum;
+          }
+          if (qpStats[qobj].title === "Healing Done") {
+            let pointNum = parseFloat(qpStats[qobj].value);
+            qpAssistObj.hdone = pointNum;
+          }
+          if (qpStats[qobj].title === "Recon Assists") {
+            let pointNum = parseFloat(qpStats[qobj].value);
+            qpAssistObj.rassist = pointNum;
+          }
+        }
+        this.qassists.push(qpAssistObj);
+        
+      }
+      
+      console.log(this.qassists)
+      this.qAssistsRows = this.qassists;
+      this.cAssistsRows = this.cassists;
+      console.log(this.cAssistsRows)
     },
   },
 };
